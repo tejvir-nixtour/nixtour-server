@@ -13,6 +13,48 @@ app.use(cors());
 
 connectDB();
 
+const generateTokenAndSaveTODB = async () => {
+  console.log("Generating new token and saving to DB...");
+
+  const params = new URLSearchParams();
+  params.append("grant_type", "password");
+  params.append("client_id", process.env.CLIENT_ID);
+  params.append("client_secret", process.env.CLIENT_SECRET);
+  params.append("username", process.env.TRAVELPORT_USERNAME);
+  params.append("password", process.env.PASSWORD);
+  params.append("scope", "openid");
+
+  axios
+    .post(
+      "https://oauth.pp.travelport.com/oauth/oauth20/token",
+      {
+        grant_type: "password",
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        username: process.env.TRAVELPORT_USERNAME,
+        password: process.env.PASSWORD,
+        scope: "openid",
+      },
+      {
+        headers: {
+          "Cache-Control": "no-cache",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    )
+    .then(async (response) => {
+      await Auth.findOneAndUpdate(
+        {
+          access_group: process.env.ACCESS_GROUP,
+        },
+        {
+          token: response.data.access_token,
+        }
+      );
+    })
+    .catch((error) => console.log(error?.response?.data));
+};
+
 // axios
 //   .post("https://oauth.pp.travelport.com/oauth/oauth20/token", params, {
 //     headers: {
@@ -31,39 +73,7 @@ connectDB();
 setInterval(() => {
   console.log("Refreshing token...");
 
-  const params = new URLSearchParams();
-  params.append("grant_type", "password");
-  params.append("client_id", process.env.CLIENT_ID);
-  params.append("client_secret", process.env.CLIENT_SECRET);
-  params.append("username", process.env.TRAVELPORT_USERNAME);
-  params.append("password", process.env.PASSWORD);
-  params.append("scope", "openid");
-
-  axios
-    .post(
-      "https://oauth.pp.travelport.com/oauth/oauth20/token",
-      {
-        grant_type: "password",
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
-        username: process.env.USERNAME,
-        password: process.env.PASSWORD,
-        scope: "openid",
-      },
-      {
-        headers: {
-          "Cache-Control": "no-cache",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    )
-    .then(async (response) => {
-      await Auth.create({
-        token: response.data.access_token,
-        access_group: process.env.ACCESS_GROUP,
-      });
-    })
-    .catch((error) => console.log(error.response.data));
+  generateTokenAndSaveTODB();
 }, 24 * 60 * 60 * 1000); // 24 hours
 
 let Token = "";
@@ -109,6 +119,13 @@ app.post("/api/travelport/search", async (req, res) => {
     );
     res.status(200).json(response.data);
   } catch (error) {
+    console.log(error?.response?.data);
+    if (
+      error?.response?.data ===
+      "1012117 - Invalid token. The token has expired."
+    ) {
+      generateTokenAndSaveTODB();
+    }
     res.status(500).json({ error: error.message });
   }
 });

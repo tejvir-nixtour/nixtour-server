@@ -4,6 +4,7 @@ const app = express();
 const cors = require("cors");
 const connectDB = require("./connect");
 const Auth = require("./authModel");
+const dayjs = require("dayjs");
 
 require("dotenv").config();
 
@@ -12,6 +13,8 @@ app.use(express.json());
 app.use(cors());
 
 connectDB();
+
+const now = dayjs(); // current time
 
 const generateTokenAndSaveTODB = async () => {
   console.log("Generating new token and saving to DB...");
@@ -43,14 +46,17 @@ const generateTokenAndSaveTODB = async () => {
       }
     )
     .then(async (response) => {
-      await Auth.findOneAndUpdate(
-        {
-          access_group: process.env.ACCESS_GROUP,
-        },
-        {
-          token: response.data.access_token,
-        }
-      );
+      try {
+        await Auth.findByIdAndUpdate(
+          { id: process.env.ID },
+          {
+            access_group: process.env.ACCESS_GROUP,
+            token: response.data.access_token,
+          }
+        );
+      } catch (error) {
+        console.log("Mongo Error:", error?.message);
+      }
     })
     .catch((error) => console.log(error?.response?.data));
 };
@@ -85,12 +91,24 @@ const fetchToken = async () => {
     if (response.length > 0) {
       Token = response[0].token;
       Access_Group = response[0].access_group;
+      const tokenDate = dayjs(response[0]?.updatedAt);
+
+      // Calculate difference in hours
+      const diffInHours = now.diff(tokenDate, "hour");
+      console.log("Token is last Updated at:", response[0]?.updatedAt);
+
+      if (diffInHours >= 24) {
+        console.log("Token expired or 24 hours passed — run your function");
+        generateTokenAndSaveTODB(); // 👈 replace with your logic
+      } else {
+        console.log(`Token still valid. ${24 - diffInHours} hours left.`);
+      }
       console.log("Token and Access_Group fetched from DB");
     }
 
     return;
   } catch (error) {
-    console.log(error);
+    console.log("Mongo Error:", error);
   }
 };
 
@@ -119,10 +137,11 @@ app.post("/api/travelport/search", async (req, res) => {
     );
     res.status(200).json(response.data);
   } catch (error) {
-    console.log(error?.response?.data);
+    console.log(error?.response?.data || error?.message);
     if (
       error?.response?.data ===
-      "1012117 - Invalid token. The token has expired."
+        "1012117 - Invalid token. The token has expired." ||
+      !Token
     ) {
       generateTokenAndSaveTODB();
     }

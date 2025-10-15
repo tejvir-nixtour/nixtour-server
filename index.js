@@ -47,13 +47,10 @@ const generateTokenAndSaveTODB = async () => {
     )
     .then(async (response) => {
       try {
-        await Auth.findByIdAndUpdate(
-          { id: process.env.ID },
-          {
-            access_group: process.env.ACCESS_GROUP,
-            token: response.data.access_token,
-          }
-        );
+        await Auth.findByIdAndUpdate(process.env.ID, {
+          access_group: process.env.ACCESS_GROUP,
+          token: response.data.access_token,
+        });
       } catch (error) {
         console.log("Mongo Error:", error?.message);
       }

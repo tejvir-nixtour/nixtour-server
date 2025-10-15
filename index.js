@@ -97,6 +97,7 @@ const fetchToken = async () => {
       if (diffInHours >= 24) {
         console.log("Token expired or 24 hours passed — run your function");
         generateTokenAndSaveTODB(); // 👈 replace with your logic
+        fetchToken();
       } else {
         console.log(`Token still valid. ${24 - diffInHours} hours left.`);
       }

@@ -174,6 +174,33 @@ app.post("/api/travelport/price", async (req, res) => {
   }
 });
 
+// Seat Selection
+
+app.post("/api/travelport/seat", async (req, res) => {
+  try {
+    const response = await axios.post(
+      "https://api.pp.travelport.com/11/air/search/seat/catalogofferingsancillaries/seatavailabilities",
+      req.body,
+      {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+          "Content-Type": "application/json",
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
+          Accept: "application/json",
+          taxBreakDown: true,
+          "Accept-Version": 11,
+          "Content-Version": 11,
+          "Accept-Encoding": "gzip, deflate, br",
+          Connection: "keep-alive",
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // creating workbench (booking session)
 
 app.post("/api/travelport/workbench-initial", async (req, res) => {

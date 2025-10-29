@@ -210,9 +210,9 @@ app.post("/api/travelport/workbench-initial", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -237,9 +237,9 @@ app.post("/api/travelport/offer-to-workbench", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -264,9 +264,9 @@ app.post("/api/travelport/add-traveler-to-workbench", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -291,9 +291,9 @@ app.post("/api/travelport/seat-map", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -318,9 +318,9 @@ app.post("/api/travelport/seat-book", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -345,9 +345,9 @@ app.post("/api/travelport/seat-map-to-workbench", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -372,9 +372,9 @@ app.post("/api/travelport/form-of-payment", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -399,9 +399,9 @@ app.post("/api/travelport/payment-to-workbench", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -426,9 +426,9 @@ app.post("/api/travelport/commit-to-workbench", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
@@ -453,9 +453,9 @@ app.post("/api/travelport/fare-rules", async (req, res) => {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: process.env.ACCESS_GROUP,
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,

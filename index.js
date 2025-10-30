@@ -234,7 +234,7 @@ app.post("/api/travelport/offer-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
       `https://api.pp.travelport.com/11/air/book/airoffer/reservationworkbench/${req.body.workbench_id}/offers/buildfromcatalogproductofferings`,
-      req.body,
+      req.body.params,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
@@ -261,7 +261,7 @@ app.post("/api/travelport/add-traveler-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
       `https://api.pp.travelport.com/11/air/book/traveler/reservationworkbench/${req.body.workbench_id}/travelers`,
-      req.body,
+      req.body.params,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
@@ -309,40 +309,13 @@ app.post("/api/travelport/seat-map", async (req, res) => {
   }
 });
 
-// Seat Map (Seat Booking) : OPTIONAL
-
-app.post("/api/travelport/seat-book", async (req, res) => {
-  try {
-    const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/search/seat/catalogofferingsancillaries/seatavailabilities`,
-      req.body,
-      {
-        headers: {
-          Authorization: `Bearer ${Token}`,
-          "Content-Type": "application/json",
-          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
-          Accept: "application/json",
-          taxBreakDown: true,
-          "Accept-Version": 11,
-          "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
-          Connection: "keep-alive",
-        },
-      }
-    );
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // Seat Map to Workbench (Seat Booking) : OPTIONAL
 
 app.post("/api/travelport/seat-map-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
       `https://api.pp.travelport.com/11/air/book/airoffer/reservationworkbench/${req.body.workbench_id}/offers/buildancillaryoffersfromcatalogofferings`,
-      req.body,
+      req.body.params,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
@@ -369,7 +342,7 @@ app.post("/api/travelport/form-of-payment", async (req, res) => {
   try {
     const response = await axios.post(
       `https://api.pp.travelport.com/11/air/payment/reservationworkbench/${req.body.workbench_id}/formofpayment`,
-      req.body,
+      req.body.params,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
@@ -396,7 +369,7 @@ app.post("/api/travelport/payment-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
       `https://api.pp.travelport.com/11/air/paymentoffer/reservationworkbench/${req.body.workbench_id}/payments`,
-      req.body,
+      req.body.params,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
@@ -423,7 +396,34 @@ app.post("/api/travelport/commit-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
       `https://api.pp.travelport.com/11/air/book/reservation/reservations/${req.body.workbench_id}`,
-      req.body,
+      req.body.params,
+      {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+          "Content-Type": "application/json",
+          XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
+          Accept: "application/json",
+          taxBreakDown: true,
+          "Accept-Version": 11,
+          "Content-Version": 11,
+          "Accept-Encoding": "gzip, deflate, br",
+          Connection: "keep-alive",
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Post Commit the workbench
+
+app.post("/api/travelport/post-commit-to-workbench", async (req, res) => {
+  try {
+    const response = await axios.post(
+      `https://api.pp.travelport.com/11/air/book/session/reservationworkbench/buildfromlocator?Locator=${req.body.locator}`,
+      req.body.params,
       {
         headers: {
           Authorization: `Bearer ${Token}`,

@@ -29,7 +29,7 @@ const generateTokenAndSaveTODB = async () => {
 
   axios
     .post(
-      "https://oauth.pp.travelport.com/oauth/oauth20/token",
+      `https://${process.env.TRAVELPORT_ENDPOINT_FOR_TOKEN}`,
       {
         grant_type: "password",
         client_id: process.env.CLIENT_ID,
@@ -42,6 +42,7 @@ const generateTokenAndSaveTODB = async () => {
         headers: {
           "Cache-Control": "no-cache",
           "Content-Type": "application/x-www-form-urlencoded",
+          "Accept-Encoding": "gzip, deflate",
         },
       }
     )
@@ -81,6 +82,17 @@ setInterval(() => {
 
 let Token = "";
 let Access_Group = "";
+let traceID = "";
+
+// Generate a UUID v4 and set as collection variable 'traceID' if not already set in this execution
+function generateUUIDv4() {
+  // https://stackoverflow.com/a/2117523/2715716
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 const fetchToken = async () => {
   try {
@@ -115,9 +127,11 @@ fetchToken();
 // fetch/search flights
 
 app.post("/api/travelport/search", async (req, res) => {
+  traceID = generateUUIDv4();
+
   try {
     const response = await axios.post(
-      "https://api.pp.travelport.com/11/air/catalog/search/catalogproductofferings",
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/catalog/search/catalogproductofferings`,
       req.body,
       {
         headers: {
@@ -125,10 +139,11 @@ app.post("/api/travelport/search", async (req, res) => {
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
+          traceID,
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -152,18 +167,19 @@ app.post("/api/travelport/search", async (req, res) => {
 app.post("/api/travelport/price", async (req, res) => {
   try {
     const response = await axios.post(
-      "https://api.pp.travelport.com/11/air/price/offers/buildfromcatalogproductofferings",
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/price/offers/buildfromcatalogproductofferings`,
       req.body,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
+          traceID,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -179,7 +195,7 @@ app.post("/api/travelport/price", async (req, res) => {
 app.post("/api/travelport/seat", async (req, res) => {
   try {
     const response = await axios.post(
-      "https://api.pp.travelport.com/11/air/search/seat/catalogofferingsancillaries/seatavailabilities",
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/search/seat/catalogofferingsancillaries/seatavailabilities`,
       req.body,
       {
         headers: {
@@ -187,10 +203,11 @@ app.post("/api/travelport/seat", async (req, res) => {
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
+          traceID,
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -206,18 +223,19 @@ app.post("/api/travelport/seat", async (req, res) => {
 app.post("/api/travelport/workbench-initial", async (req, res) => {
   try {
     const response = await axios.post(
-      "https://api.pp.travelport.com/11/air/book/session/reservationworkbench",
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/book/session/reservationworkbench`,
       req.body,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
+          traceID,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -229,11 +247,10 @@ app.post("/api/travelport/workbench-initial", async (req, res) => {
 });
 
 // Add Offer to the Workbench
-
 app.post("/api/travelport/offer-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/book/airoffer/reservationworkbench/${req.body.workbench_id}/offers/buildfromcatalogproductofferings`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/book/airoffer/reservationworkbench/${req.body.workbench_id}/offers/buildfromcatalogproductofferings`,
       req.body.params,
       {
         headers: {
@@ -241,10 +258,11 @@ app.post("/api/travelport/offer-to-workbench", async (req, res) => {
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
+          traceID,
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -256,22 +274,22 @@ app.post("/api/travelport/offer-to-workbench", async (req, res) => {
 });
 
 // Add Travelers (multi-passenger)
-
 app.post("/api/travelport/add-traveler-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/book/traveler/reservationworkbench/${req.body.workbench_id}/travelers`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/book/traveler/reservationworkbench/${req.body.workbench_id}/travelers`,
       req.body.params,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
+          traceID,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -283,22 +301,22 @@ app.post("/api/travelport/add-traveler-to-workbench", async (req, res) => {
 });
 
 // Seat Map (Seat Booking) : OPTIONAL
-
 app.post("/api/travelport/seat-map", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/search/seat/catalogofferingsancillaries/seatavailabilities`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/search/seat/catalogofferingsancillaries/seatavailabilities`,
       req.body,
       {
         headers: {
           Authorization: `Bearer ${Token}`,
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
+          traceID,
           Accept: "application/json",
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -310,11 +328,10 @@ app.post("/api/travelport/seat-map", async (req, res) => {
 });
 
 // Seat Map to Workbench (Seat Booking) : OPTIONAL
-
 app.post("/api/travelport/seat-map-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/book/airoffer/reservationworkbench/${req.body.workbench_id}/offers/buildancillaryoffersfromcatalogofferings`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/book/airoffer/reservationworkbench/${req.body.workbench_id}/offers/buildancillaryoffersfromcatalogofferings`,
       req.body.params,
       {
         headers: {
@@ -323,9 +340,10 @@ app.post("/api/travelport/seat-map-to-workbench", async (req, res) => {
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
+          traceID,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -337,11 +355,10 @@ app.post("/api/travelport/seat-map-to-workbench", async (req, res) => {
 });
 
 // Form of Payment
-
 app.post("/api/travelport/form-of-payment", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/payment/reservationworkbench/${req.body.workbench_id}/formofpayment`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/payment/reservationworkbench/${req.body.workbench_id}/formofpayment`,
       req.body.params,
       {
         headers: {
@@ -350,9 +367,10 @@ app.post("/api/travelport/form-of-payment", async (req, res) => {
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
+          traceID,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -364,11 +382,10 @@ app.post("/api/travelport/form-of-payment", async (req, res) => {
 });
 
 // Add Payment to Offer
-
 app.post("/api/travelport/payment-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/paymentoffer/reservationworkbench/${req.body.workbench_id}/payments`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/paymentoffer/reservationworkbench/${req.body.workbench_id}/payments`,
       req.body.params,
       {
         headers: {
@@ -376,10 +393,11 @@ app.post("/api/travelport/payment-to-workbench", async (req, res) => {
           "Content-Type": "application/json",
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
+          traceID,
           taxBreakDown: true,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -391,11 +409,10 @@ app.post("/api/travelport/payment-to-workbench", async (req, res) => {
 });
 
 // Commit the workbench
-
 app.post("/api/travelport/commit-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/book/reservation/reservations/${req.body.workbench_id}`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/book/reservation/reservations/${req.body.workbench_id}`,
       req.body.params,
       {
         headers: {
@@ -404,9 +421,10 @@ app.post("/api/travelport/commit-to-workbench", async (req, res) => {
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
+          traceID,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -418,11 +436,10 @@ app.post("/api/travelport/commit-to-workbench", async (req, res) => {
 });
 
 // Post Commit the workbench
-
 app.post("/api/travelport/post-commit-to-workbench", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/book/session/reservationworkbench/buildfromlocator?Locator=${req.body.locator}`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/book/session/reservationworkbench/buildfromlocator?Locator=${req.body.locator}`,
       req.body.params,
       {
         headers: {
@@ -431,9 +448,10 @@ app.post("/api/travelport/post-commit-to-workbench", async (req, res) => {
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
+          traceID,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }
@@ -445,11 +463,10 @@ app.post("/api/travelport/post-commit-to-workbench", async (req, res) => {
 });
 
 // Fare Rules and Exchanges
-
 app.post("/api/travelport/fare-rules", async (req, res) => {
   try {
     const response = await axios.post(
-      `https://api.pp.travelport.com/11/air/air/faredisplay/fares`,
+      `https://${process.env.TRAVELPORT_ENDPOINT}/11/air/air/faredisplay/fares`,
       req.body,
       {
         headers: {
@@ -458,9 +475,10 @@ app.post("/api/travelport/fare-rules", async (req, res) => {
           XAUTH_TRAVELPORT_ACCESSGROUP: Access_Group,
           Accept: "application/json",
           taxBreakDown: true,
+          traceID,
           "Accept-Version": 11,
           "Content-Version": 11,
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Encoding": "gzip, deflate",
           Connection: "keep-alive",
         },
       }

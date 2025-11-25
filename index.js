@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./connect");
 const Auth = require("./authModel");
 const dayjs = require("dayjs");
+const uapi = require("./routes/uapiRoutes.js");
 
 require("dotenv").config();
 
@@ -56,7 +57,7 @@ const generateTokenAndSaveTODB = async () => {
         console.log("Mongo Error:", error?.message);
       }
     })
-    .catch((error) => console.log(error?.response?.data));
+    .catch((error) => console.error(error?.response?.data));
 };
 
 // axios
@@ -124,6 +125,8 @@ const fetchToken = async () => {
 
 fetchToken();
 
+app.use("/api/uapi", uapi);
+
 // fetch/search flights
 
 app.post("/api/travelport/search", async (req, res) => {
@@ -157,8 +160,10 @@ app.post("/api/travelport/search", async (req, res) => {
       !Token
     ) {
       generateTokenAndSaveTODB();
+      return;
     }
-    res.status(500).json({ error: error.message });
+    console.log("Flight Search Error");
+    return res.status(500).json({ error });
   }
 });
 
@@ -186,7 +191,8 @@ app.post("/api/travelport/price", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Air Price Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -214,7 +220,8 @@ app.post("/api/travelport/seat", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("SeatMap Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -242,7 +249,8 @@ app.post("/api/travelport/workbench-initial", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Workbench Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -269,7 +277,8 @@ app.post("/api/travelport/offer-to-workbench", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Offer to Workbench Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -296,7 +305,8 @@ app.post("/api/travelport/add-traveler-to-workbench", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Add Traveler Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -350,7 +360,8 @@ app.post("/api/travelport/seat-map-to-workbench", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Seat Map to Workbench Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -431,7 +442,8 @@ app.post("/api/travelport/commit-to-workbench", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Post Commit to Workbench Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -458,7 +470,8 @@ app.post("/api/travelport/post-commit-to-workbench", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Post Commit to Workbench Error");
+    res.status(500).json({ error });
   }
 });
 
@@ -485,7 +498,8 @@ app.post("/api/travelport/fare-rules", async (req, res) => {
     );
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Fare Rules Error");
+    res.status(500).json({ error });
   }
 });
 
